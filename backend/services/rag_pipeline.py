@@ -1,8 +1,7 @@
-from resume_parser import extract_text_from_pdf
-from chunker import chunk_text
-from embedding_service import generate_embedding
-from vector_store import add_document
-
+from backend.services.resume_parser import extract_text_from_pdf
+from backend.services.chunker import chunk_text
+from backend.services.embedding_service import generate_embedding
+from backend.services.vector_store import add_document
 
 def ingest_resume(pdf_path):
 

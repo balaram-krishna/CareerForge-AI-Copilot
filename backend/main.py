@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
+from backend.services.rag_pipeline import ingest_resume
+from backend.services.vector_store import clear_collection
 
 from backend.services.resume_parser import extract_text_from_pdf
 from backend.services.resume_analyzer import extract_skills
@@ -49,6 +51,12 @@ async def upload_resume(file: UploadFile = File(...)):
 
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
+
+    # Remove previous resume vectors
+    clear_collection()
+
+    # Store newly uploaded resume
+    ingest_resume(file_path)
 
     extracted_text = extract_text_from_pdf(file_path)
 

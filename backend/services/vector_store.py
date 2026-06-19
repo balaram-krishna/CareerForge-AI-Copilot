@@ -1,17 +1,17 @@
 import chromadb
 
-client = chromadb.PersistentClient(path="./chroma_db")
+client = chromadb.PersistentClient(path="chroma_db")
 
 collection = client.get_or_create_collection(
-    name="careerforge_documents"
+    name="resumes"
 )
 
 
-def add_document(doc_id, text, embedding):
+def add_document(doc_id, document, embedding):
 
     collection.add(
         ids=[doc_id],
-        documents=[text],
+        documents=[document],
         embeddings=[embedding]
     )
 
@@ -24,3 +24,17 @@ def search_documents(query_embedding, top_k=3):
     )
 
     return results
+
+
+def clear_collection():
+
+    try:
+        all_docs = collection.get()
+
+        if all_docs["ids"]:
+            collection.delete(
+                ids=all_docs["ids"]
+            )
+
+    except Exception as e:
+        print("Clear Error:", e)
