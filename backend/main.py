@@ -1,8 +1,4 @@
-import os
 
-print("PORT =", os.getenv("PORT"))
-
-print("MAIN FILE STARTED")
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from backend.services.rag_pipeline import ingest_resume

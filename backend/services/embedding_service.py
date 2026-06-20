@@ -1,14 +1,30 @@
-from sentence_transformers import SentenceTransformer
+import os
+from dotenv import load_dotenv
+import google.generativeai as genai
 
-print("EMBEDDING FILE IMPORT STARTED")
+load_dotenv()
 
-print("LOADING MODEL")
-model = SentenceTransformer("all-MiniLM-L6-v2")
-print("MODEL LOADED")
+genai.configure(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
 
 def generate_embedding(text):
 
-    embedding = model.encode(text)
+    response = genai.embed_content(
+        model="models/gemini-embedding-001",
+        content=text,
+        task_type="retrieval_document"
+    )
 
-    return embedding.tolist()
+    return response["embedding"]
+
+
+if __name__ == "__main__":
+
+    vector = generate_embedding(
+        "Python FastAPI Docker AWS"
+    )
+
+    print("Vector Length:", len(vector))
+    print(vector[:10])
