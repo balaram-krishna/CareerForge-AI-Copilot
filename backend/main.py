@@ -49,6 +49,10 @@ def home():
 
 @app.post("/upload-resume")
 async def upload_resume(file: UploadFile = File(...)):
+    
+    print("UPLOAD ENDPOINT HIT")
+    print("CURRENT DIR:", os.getcwd())
+    print("CREATING DATA FOLDER")
 
     # Create data folder on Render if it doesn't exist
     os.makedirs("data", exist_ok=True)
