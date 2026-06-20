@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 
+BACKEND_URL = "https://careerforge-ai-copilot-3.onrender.com"
+
 st.set_page_config(
     page_title="CareerForge AI Copilot",
     page_icon="🚀",
@@ -42,7 +44,7 @@ with tab1:
         }
 
         response = requests.post(
-            "http://127.0.0.1:9000/upload-resume",
+            f"{BACKEND_URL}/upload-resume",
             files=files
         )
 
@@ -50,7 +52,6 @@ with tab1:
 
             data = response.json()
 
-            # Save skills for ATS analysis
             st.session_state["resume_skills"] = data["skills"]
 
             st.success("Resume Uploaded Successfully")
@@ -93,7 +94,7 @@ with tab2:
         elif job_description:
 
             response = requests.post(
-                "http://127.0.0.1:9000/analyze-job",
+                f"{BACKEND_URL}/analyze-job",
                 json={
                     "resume_skills": resume_skills,
                     "job_description": job_description
@@ -140,7 +141,7 @@ with tab3:
         if question:
 
             response = requests.post(
-                "http://127.0.0.1:9000/ask-copilot",
+                f"{BACKEND_URL}/ask-copilot",
                 json={
                     "question": question
                 }

@@ -1,6 +1,8 @@
+import os
 
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
+
 from backend.services.rag_pipeline import ingest_resume
 from backend.services.vector_store import clear_collection
 
@@ -48,6 +50,9 @@ def home():
 @app.post("/upload-resume")
 async def upload_resume(file: UploadFile = File(...)):
 
+    # Create data folder on Render if it doesn't exist
+    os.makedirs("data", exist_ok=True)
+
     file_path = f"data/{file.filename}"
 
     with open(file_path, "wb") as buffer:
@@ -56,7 +61,7 @@ async def upload_resume(file: UploadFile = File(...)):
     # Remove previous resume vectors
     clear_collection()
 
-    # Store newly uploaded resume
+    # Store newly uploaded resume in ChromaDB
     ingest_resume(file_path)
 
     extracted_text = extract_text_from_pdf(file_path)
