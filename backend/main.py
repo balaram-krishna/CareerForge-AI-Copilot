@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 
+from backend.services.resume_improver import generate_resume_suggestions
 from backend.services.rag_pipeline import ingest_resume
 from backend.services.vector_store import clear_collection
 from backend.services.resume_parser import extract_text_from_pdf
@@ -38,7 +39,7 @@ class CopilotRequest(BaseModel):
 @app.get("/")
 def home():
     return {
-        "message": "CareerForge AI Copilot Backend v2 TEST"
+        "message": "CareerForge AI Copilot Backend is Running"
     }
 
 
@@ -50,27 +51,17 @@ def home():
 async def upload_resume(file: UploadFile = File(...)):
 
     print("UPLOAD ENDPOINT HIT")
-    print("CURRENT DIR:", os.getcwd())
 
-    # Create data folder if it doesn't exist
     data_dir = os.path.join(os.getcwd(), "data")
     os.makedirs(data_dir, exist_ok=True)
 
-    print("DATA FOLDER CREATED:", data_dir)
-
     file_path = os.path.join(data_dir, file.filename)
-
-    print("SAVING FILE TO:", file_path)
 
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
 
-    print("FILE SAVED SUCCESSFULLY")
-
-    # Remove previous resume vectors
     clear_collection()
 
-    # Store newly uploaded resume
     ingest_resume(file_path)
 
     extracted_text = extract_text_from_pdf(file_path)
@@ -99,6 +90,15 @@ def analyze_job(request: JobAnalysisRequest):
         request.resume_skills,
         jd_skills
     )
+
+    suggestions = generate_resume_suggestions(
+        request.resume_skills,
+        result["matched_skills"],
+        result["missing_skills"],
+        request.job_description
+    )
+
+    result["suggestions"] = suggestions
 
     return result
 

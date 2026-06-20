@@ -120,6 +120,9 @@ with tab2:
                 st.write("### Missing Skills")
                 st.write(data["missing_skills"])
 
+                st.write("### Resume Improvement Suggestions")
+                st.write(data["suggestions"])
+
             else:
                 st.error(response.text)
 
