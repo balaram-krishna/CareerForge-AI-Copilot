@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from backend.services.rag_pipeline import ingest_resume
 from backend.services.vector_store import clear_collection
-
 from backend.services.resume_parser import extract_text_from_pdf
 from backend.services.resume_analyzer import extract_skills
 from backend.services.jd_analyzer import extract_jd_skills
@@ -39,7 +38,7 @@ class CopilotRequest(BaseModel):
 @app.get("/")
 def home():
     return {
-        "message": "CareerForge AI Copilot Backend is Running"
+        "message": "CareerForge AI Copilot Backend v2 TEST"
     }
 
 
@@ -49,23 +48,29 @@ def home():
 
 @app.post("/upload-resume")
 async def upload_resume(file: UploadFile = File(...)):
-    
+
     print("UPLOAD ENDPOINT HIT")
     print("CURRENT DIR:", os.getcwd())
-    print("CREATING DATA FOLDER")
 
-    # Create data folder on Render if it doesn't exist
-    os.makedirs("data", exist_ok=True)
+    # Create data folder if it doesn't exist
+    data_dir = os.path.join(os.getcwd(), "data")
+    os.makedirs(data_dir, exist_ok=True)
 
-    file_path = f"data/{file.filename}"
+    print("DATA FOLDER CREATED:", data_dir)
+
+    file_path = os.path.join(data_dir, file.filename)
+
+    print("SAVING FILE TO:", file_path)
 
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
 
+    print("FILE SAVED SUCCESSFULLY")
+
     # Remove previous resume vectors
     clear_collection()
 
-    # Store newly uploaded resume in ChromaDB
+    # Store newly uploaded resume
     ingest_resume(file_path)
 
     extracted_text = extract_text_from_pdf(file_path)
