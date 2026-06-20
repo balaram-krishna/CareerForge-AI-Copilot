@@ -1,3 +1,7 @@
+import os
+
+print("PORT =", os.getenv("PORT"))
+
 print("MAIN FILE STARTED")
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
