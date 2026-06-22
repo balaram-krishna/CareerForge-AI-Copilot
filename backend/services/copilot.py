@@ -1,10 +1,12 @@
 from backend.services.retriever import retrieve_context
 from backend.services.llm_service import generate_response
 
-
 def ask_copilot(question):
 
     context_chunks = retrieve_context(question)
+
+    print("Retrieved Chunks:")
+    print(context_chunks)
 
     context = "\n\n".join(context_chunks)
 

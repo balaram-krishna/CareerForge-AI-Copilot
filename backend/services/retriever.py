@@ -10,4 +10,7 @@ def retrieve_context(query, top_k=3):
         top_k
     )
 
+    print("QUERY:", query)
+    print("RESULTS:", results)
+
     return results["documents"][0]

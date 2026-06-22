@@ -7,7 +7,12 @@ def ingest_resume(pdf_path):
 
     text = extract_text_from_pdf(pdf_path)
 
+    print("TEXT LENGTH:", len(text))
+    print(text[:500])
+
     chunks = chunk_text(text)
+
+    print("TOTAL CHUNKS:", len(chunks))
 
     for index, chunk in enumerate(chunks):
 
@@ -19,4 +24,4 @@ def ingest_resume(pdf_path):
             embedding
         )
 
-    return len(chunks) 
+    return len(chunks)
