@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
-
+from backend.services.ats_engine import calculate_ats_score
 from backend.services.resume_improver import generate_resume_suggestions
 from backend.services.rag_pipeline import ingest_resume
 from backend.services.vector_store import clear_collection

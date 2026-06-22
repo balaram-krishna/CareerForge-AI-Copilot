@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import requests
 
@@ -43,28 +44,38 @@ with tab1:
             )
         }
 
-        response = requests.post(
-            f"{BACKEND_URL}/upload-resume",
-            files=files
-        )
+        try:
 
-        if response.status_code == 200:
-
-            data = response.json()
-
-            st.session_state["resume_skills"] = data["skills"]
-
-            st.success("Resume Uploaded Successfully")
-
-            st.write("### Skills Found")
-            st.write(data["skills"])
-
-            st.write(
-                f"Text Length: {data['text_length']}"
+            response = requests.post(
+                f"{BACKEND_URL}/upload-resume",
+                files=files
             )
 
-        else:
-            st.error(response.text)
+            if response.status_code == 200:
+
+                data = response.json()
+
+                st.session_state["resume_skills"] = data.get(
+                    "skills",
+                    []
+                )
+
+                st.success("Resume Uploaded Successfully")
+
+                st.write("### Skills Found")
+                st.write(
+                    data.get("skills", [])
+                )
+
+                st.write(
+                    f"Text Length: {data.get('text_length', 0)}"
+                )
+
+            else:
+                st.error(response.text)
+
+        except Exception as e:
+            st.error(f"Error: {e}")
 
 
 # =========================
@@ -76,7 +87,8 @@ with tab2:
     st.header("ATS Analyzer")
 
     job_description = st.text_area(
-        "Paste Job Description"
+        "Paste Job Description",
+        height=250
     )
 
     if st.button("Analyze ATS Score"):
@@ -87,44 +99,106 @@ with tab2:
         )
 
         if not resume_skills:
+
             st.warning(
                 "Please upload a resume first."
             )
 
-        elif job_description:
+        elif not job_description.strip():
 
-            response = requests.post(
-                f"{BACKEND_URL}/analyze-job",
-                json={
-                    "resume_skills": resume_skills,
-                    "job_description": job_description
-                }
+            st.warning(
+                "Please paste a Job Description."
             )
 
-            if response.status_code == 200:
+        else:
 
-                data = response.json()
+            try:
 
-                st.success(
-                    "ATS Analysis Complete"
+                response = requests.post(
+                    f"{BACKEND_URL}/analyze-job",
+                    json={
+                        "resume_skills": resume_skills,
+                        "job_description": job_description
+                    }
                 )
 
-                st.metric(
-                    "ATS Score",
-                    f"{data['score']}%"
+                if response.status_code == 200:
+
+                    data = response.json()
+
+                    st.success(
+                        "ATS Analysis Complete"
+                    )
+
+                    st.metric(
+                        "ATS Score",
+                        f"{data.get('score', 0)}%"
+                    )
+
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.write("### ✅ Matched Skills")
+                        st.write(
+                            data.get(
+                                "matched_skills",
+                                []
+                            )
+                        )
+
+                    with col2:
+                        st.write("### ❌ Missing Skills")
+                        st.write(
+                            data.get(
+                                "missing_skills",
+                                []
+                            )
+                        )
+
+                    st.write(
+                        "### 💡 Resume Improvement Suggestions"
+                    )
+
+                    suggestions = data.get(
+                        "suggestions",
+                        ""
+                    )
+
+                    if suggestions:
+
+                        if isinstance(
+                            suggestions,
+                            list
+                        ):
+
+                            for item in suggestions:
+                                st.write(f"• {item}")
+
+                        else:
+                            st.write(suggestions)
+
+                    else:
+
+                        st.info(
+                            "No suggestions available."
+                        )
+
+                    with st.expander(
+                        "Debug API Response"
+                    ):
+                        st.json(data)
+
+                else:
+
+                    st.error(
+                        f"Backend Error: {response.text}"
+                    )
+
+            except Exception as e:
+
+                st.error(
+                    f"Error: {e}"
                 )
-
-                st.write("### Matched Skills")
-                st.write(data["matched_skills"])
-
-                st.write("### Missing Skills")
-                st.write(data["missing_skills"])
-
-                st.write("### Resume Improvement Suggestions")
-                st.write(data["suggestions"])
-
-            else:
-                st.error(response.text)
 
 
 # =========================
@@ -136,31 +210,60 @@ with tab3:
     st.header("CareerForge AI Copilot")
 
     question = st.text_input(
-        "Ask a Question"
+        "Ask a Career Question"
     )
 
     if st.button("Ask Copilot"):
 
-        if question:
+        if question.strip():
 
-            response = requests.post(
-                f"{BACKEND_URL}/ask-copilot",
-                json={
-                    "question": question
-                }
-            )
+            try:
 
-            if response.status_code == 200:
+                response = requests.post(
+                    f"{BACKEND_URL}/ask-copilot",
+                    json={
+                        "question": question
+                    }
+                )
 
-                data = response.json()
+                if response.status_code == 200:
 
-                st.success("Answer Generated")
+                    data = response.json()
 
-                st.write("### Question")
-                st.write(data["question"])
+                    st.success(
+                        "Answer Generated"
+                    )
 
-                st.write("### Answer")
-                st.write(data["answer"])
+                    st.write(
+                        "### Question"
+                    )
 
-            else:
-                st.error(response.text)
+                    st.write(
+                        data.get(
+                            "question",
+                            question
+                        )
+                    )
+
+                    st.write(
+                        "### Answer"
+                    )
+
+                    st.write(
+                        data.get(
+                            "answer",
+                            "No answer returned."
+                        )
+                    )
+
+                else:
+
+                    st.error(
+                        response.text
+                    )
+
+            except Exception as e:
+
+                st.error(
+                    f"Error: {e}"
+                )

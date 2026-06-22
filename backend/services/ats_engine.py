@@ -16,27 +16,3 @@ def calculate_ats_score(resume_skills, jd_skills):
         "matched_skills": sorted(matched),
         "missing_skills": sorted(missing)
     }
-
-
-if __name__ == "__main__":
-
-    resume_skills = [
-        "Python",
-        "FastAPI",
-        "Docker"
-    ]
-
-    jd_skills = [
-        "Python",
-        "FastAPI",
-        "Docker",
-        "AWS",
-        "PostgreSQL"
-    ]
-
-    result = calculate_ats_score(
-        resume_skills,
-        jd_skills
-    )
-
-    print(result)
