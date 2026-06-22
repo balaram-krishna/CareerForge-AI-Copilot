@@ -1,30 +1,27 @@
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+# backend/services/ats_engine.py
 
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
+def calculate_ats_score(resume_skills, jd_skills):
 
-def calculate_ats_score(
-    resume_text,
-    job_description
-):
+    resume_set = set(resume_skills)
+    jd_set = set(jd_skills)
 
-    resume_embedding = model.encode(
-        [resume_text]
+    matched = list(
+        resume_set.intersection(jd_set)
     )
 
-    jd_embedding = model.encode(
-        [job_description]
+    missing = list(
+        jd_set - resume_set
     )
 
-    similarity = cosine_similarity(
-        resume_embedding,
-        jd_embedding
-    )[0][0]
+    if len(jd_set) == 0:
+        score = 0
+    else:
+        score = round(
+            (len(matched) / len(jd_set)) * 100
+        )
 
-    score = round(
-        similarity * 100
-    )
-
-    return score
+    return {
+        "score": score,
+        "matched_skills": sorted(matched),
+        "missing_skills": sorted(missing)
+    }

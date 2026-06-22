@@ -1,12 +1,5 @@
 import os
 
-
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from backend.services.ats_engine import calculate_ats_score
@@ -16,7 +9,6 @@ from backend.services.vector_store import clear_collection
 from backend.services.resume_parser import extract_text_from_pdf
 from backend.services.resume_analyzer import extract_skills
 from backend.services.jd_analyzer import extract_jd_skills
-from backend.services.ats_engine import calculate_ats_score
 from backend.services.copilot import ask_copilot
 
 app = FastAPI(
