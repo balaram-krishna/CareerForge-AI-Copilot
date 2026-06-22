@@ -1,5 +1,12 @@
 import os
 
+
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+model = SentenceTransformer(
+    "all-MiniLM-L6-v2"
+)
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from backend.services.ats_engine import calculate_ats_score

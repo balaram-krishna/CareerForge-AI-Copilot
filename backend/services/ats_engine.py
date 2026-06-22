@@ -1,18 +1,30 @@
-def calculate_ats_score(resume_skills, jd_skills):
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
-    resume_set = set(resume_skills)
-    jd_set = set(jd_skills)
+model = SentenceTransformer(
+    "all-MiniLM-L6-v2"
+)
 
-    matched = list(resume_set.intersection(jd_set))
-    missing = list(jd_set - resume_set)
+def calculate_ats_score(
+    resume_text,
+    job_description
+):
 
-    if len(jd_set) == 0:
-        score = 0
-    else:
-        score = round((len(matched) / len(jd_set)) * 100)
+    resume_embedding = model.encode(
+        [resume_text]
+    )
 
-    return {
-        "score": score,
-        "matched_skills": sorted(matched),
-        "missing_skills": sorted(missing)
-    }
+    jd_embedding = model.encode(
+        [job_description]
+    )
+
+    similarity = cosine_similarity(
+        resume_embedding,
+        jd_embedding
+    )[0][0]
+
+    score = round(
+        similarity * 100
+    )
+
+    return score
