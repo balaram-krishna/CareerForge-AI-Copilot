@@ -32,6 +32,20 @@ Give:
 Keep the response concise.
 """
 
-    response = model.generate_content(prompt)
+    try:
 
-    return response.text
+        response = model.generate_content(prompt)
+
+        if not response:
+            return "No suggestions generated."
+
+        if not hasattr(response, "text"):
+            return "No text returned from Gemini."
+
+        return response.text
+
+    except Exception as e:
+
+        print("RESUME IMPROVER ERROR:", str(e))
+
+        return f"ATS suggestion generation failed: {str(e)}"

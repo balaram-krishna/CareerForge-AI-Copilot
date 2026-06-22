@@ -77,29 +77,39 @@ async def upload_resume(file: UploadFile = File(...)):
 # =========================
 # ATS Analysis Endpoint
 # =========================
-
 @app.post("/analyze-job")
 def analyze_job(request: JobAnalysisRequest):
 
-    jd_skills = extract_jd_skills(
-        request.job_description
-    )
+    try:
 
-    result = calculate_ats_score(
-        request.resume_skills,
-        jd_skills
-    )
+        jd_skills = extract_jd_skills(
+            request.job_description
+        )
 
-    suggestions = generate_resume_suggestions(
-        request.resume_skills,
-        result["matched_skills"],
-        result["missing_skills"],
-        request.job_description
-    )
+        result = calculate_ats_score(
+            request.resume_skills,
+            jd_skills
+        )
 
-    result["suggestions"] = suggestions
+        suggestions = generate_resume_suggestions(
+            request.resume_skills,
+            result["matched_skills"],
+            result["missing_skills"],
+            request.job_description
+        )
 
-    return result
+        result["suggestions"] = suggestions
+
+        return result
+
+    except Exception as e:
+
+        return {
+            "score": 0,
+            "matched_skills": [],
+            "missing_skills": [],
+            "suggestions": f"Backend Error: {str(e)}"
+        }
 
 
 # =========================
